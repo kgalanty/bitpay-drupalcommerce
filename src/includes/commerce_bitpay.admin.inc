@@ -79,9 +79,12 @@ function commerce_bitpay_connect($network) {
   $redirect = url('admin/settings/commerce-bitpay', array('absolute' => TRUE));
   try {
     $url = commerce_bitpay_get_pairing_url() . '&redirect=' . urlencode($redirect);
-    overlay_close_dialog($url);
-  }
-  catch (\Exception $e) {
+    if (module_exists('overlay') && overlay_get_mode() == 'child') {
+            overlay_close_dialog($url);
+        } else {
+            drupal_goto($url);
+        }
+    } catch (\Exception $e) {
     commerce_bitpay_log('error', t('log_unable_to_connect'));
     drupal_goto('admin/settings/commerce-bitpay');
   }
